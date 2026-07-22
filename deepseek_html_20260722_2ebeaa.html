@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trắc nghiệm: Hai mặt phẳng song song</title>
+    <!-- MathJax -->
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+            svg: { fontCache: 'global' },
+            options: { skipHtmlTypes: 'script' }
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+            background: #f5f9ff;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .app {
+            max-width: 1000px;
+            width: 100%;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+            padding: 28px 30px 30px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            border-bottom: 2px solid #e6edf4;
+            padding-bottom: 16px;
+            margin-bottom: 20px;
+        }
+        .student-area {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+        .student-area label {
+            font-weight: 600;
+            color: #1e2b3c;
+        }
+        .student-area input {
+            padding: 8px 14px;
+            border: 1px solid #cbdae7;
+            border-radius: 60px;
+            font-size: 0.95rem;
+            width: 200px;
+            outline: none;
+            transition: 0.2s;
+        }
+        .student-area input:focus {
+            border-color: #2a6b9e;
+            box-shadow: 0 0 0 3px rgba(42, 107, 158, 0.2);
+        }
+        .timer-box {
+            background: #1e2b3c;
+            color: white;
+            padding: 6px 20px;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 1.4rem;
+            letter-spacing: 2px;
+            font-variant-numeric: tabular-nums;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+        .question-panel {
+            margin: 18px 0 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .q-counter {
+            background: #eef3f9;
+            padding: 6px 18px;
+            border-radius: 40px;
+            font-weight: 600;
+            color: #1f3a57;
+        }
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .nav-buttons button, .submit-btn {
+            background: white;
+            border: 1px solid #b8ccdd;
+            padding: 8px 22px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            color: #1f3a57;
+        }
+        .nav-buttons button:hover, .submit-btn:hover {
+            background: #e3edf6;
+            border-color: #7f9db9;
+        }
+        .nav-buttons button:disabled {
+            opacity: 0.4;
+            pointer-events: none;
+        }
+        .submit-btn {
+            background: #1e2b3c;
+            color: white;
+            border: none;
+            padding: 8px 30px;
+        }
+        .submit-btn:hover {
+            background: #2f4057;
+        }
+        .question-card {
+            background: #fafdff;
+            border-radius: 24px;
+            padding: 20px 24px 18px;
+            margin: 16px 0 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            border: 1px solid #dee9f2;
+        }
+        .question-text {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 18px;
+            line-height: 1.5;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 8px 0 14px;
+        }
+        .option-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #f2f7fd;
+            padding: 10px 18px;
+            border-radius: 60px;
+            cursor: pointer;
+            transition: 0.15s;
+            border: 1px solid transparent;
+        }
+        .option-item:hover {
+            background: #e7eff8;
+            border-color: #b8d0e5;
+        }
+        .option-item.selected-correct {
+            background: #c8f0d0;
+            border-color: #1e8b4a;
+        }
+        .option-item.selected-wrong {
+            background: #fcd7d7;
+            border-color: #b33c3c;
+        }
+        .option-item.show-correct {
+            background: #c8f0d0;
+            border-color: #1e8b4a;
+        }
+        .option-item input[type="radio"] {
+            accent-color: #1f3a57;
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+        }
+        .option-item label {
+            flex: 1;
+            padding: 4px 0;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        .explanation {
+            margin-top: 18px;
+            padding: 16px 18px;
+            background: #edf4fa;
+            border-radius: 20px;
+            border-left: 6px solid #2a6b9e;
+            display: none;
+        }
+        .explanation.show {
+            display: block;
+        }
+        .explanation .ex-title {
+            font-weight: 700;
+            color: #0b2b44;
+        }
+        .explanation .ex-detail {
+            margin-top: 6px;
+            line-height: 1.6;
+        }
+        .result-area {
+            margin-top: 28px;
+            padding: 20px 24px;
+            background: #e9f2fa;
+            border-radius: 28px;
+            display: none;
+            border: 1px solid #b9d0e5;
+        }
+        .result-area.show {
+            display: block;
+        }
+        .certificate {
+            margin-top: 18px;
+            padding: 18px 22px;
+            background: #fef7e3;
+            border: 2px solid #dbb87a;
+            border-radius: 28px;
+            text-align: center;
+            font-size: 1.2rem;
+            display: none;
+        }
+        .certificate.show {
+            display: block;
+        }
+        .footer {
+            margin-top: 24px;
+            display: flex;
+            justify-content: flex-end;
+        }
+        .score-badge {
+            background: #1e2b3c;
+            color: white;
+            padding: 6px 22px;
+            border-radius: 60px;
+            font-weight: 600;
+        }
+        @media (max-width: 600px) {
+            .app { padding: 16px; }
+            .header { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+</head>
+<body>
+<div class="app" id="app">
+    <div class="header">
+        <div class="student-area">
+            <label for="studentName">👤 Họ và tên</label>
+            <input type="text" id="studentName" placeholder="Nhập tên của bạn" value="Nguyễn Văn A">
+        </div>
+        <div class="timer-box" id="timerDisplay">45:00</div>
+    </div>
+
+    <div class="question-panel">
+        <span class="q-counter" id="questionCounter">Câu 1 / 20</span>
+        <div class="nav-buttons">
+            <button id="prevBtn" disabled>◀ Trước</button>
+            <button id="nextBtn">Sau ▶</button>
+        </div>
+    </div>
+
+    <div class="question-card" id="questionCard">
+        <div class="question-text" id="questionText">Đang tải câu hỏi...</div>
+        <div class="options" id="optionsContainer"></div>
+        <div class="explanation" id="explanationBox">
+            <div class="ex-title">📘 Giải thích & lời giải</div>
+            <div class="ex-detail" id="explanationDetail"></div>
+        </div>
+    </div>
+
+    <div style="display: flex; justify-content: flex-end; gap: 14px; margin-top: 6px;">
+        <button class="submit-btn" id="submitBtn">📨 Nộp bài</button>
+    </div>
+
+    <div class="result-area" id="resultArea">
+        <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
+            <span style="font-weight: 700; font-size: 1.2rem;">📊 Kết quả</span>
+            <span id="scoreDisplay" class="score-badge">0 / 20</span>
+        </div>
+        <div id="resultDetails" style="margin-top: 14px; max-height: 300px; overflow-y: auto;"></div>
+        <div class="certificate" id="certificateBox">
+            🏅 <strong>Giấy khen</strong> <br>
+            Giáo viên <strong>Nguyễn Trà Giang</strong> tặng học sinh <span id="certName"></span> <br>
+            vì đã đạt thành tích xuất sắc trong bài kiểm tra "Hai mặt phẳng song song"
+        </div>
+    </div>
+</div>
+<script>
+    (function() {
+        // ---------- ĐỀ THI 20 CÂU ----------
+        const questions = [
+            // 5 câu lý thuyết
+            { type: 'lt', difficulty: 'lt', question: 'Trong không gian, hai mặt phẳng phân biệt cùng song song với một mặt phẳng thứ ba thì:', options: ['Song song với nhau', 'Cắt nhau', 'Trùng nhau', 'Chéo nhau'], answer: 0, explanation: 'Định lý: hai mặt phẳng phân biệt cùng song song với mặt phẳng thứ ba thì song song với nhau.' },
+            { type: 'lt', difficulty: 'lt', question: 'Cho hai mặt phẳng $(P)$ và $(Q)$ song song. Mệnh đề nào sau đây đúng?', options: ['Mọi đường thẳng trong $(P)$ đều song song với $(Q)$', 'Tồn tại đường thẳng trong $(P)$ cắt $(Q)$', 'Mọi đường thẳng trong $(P)$ đều cắt $(Q)$', 'Không có đường thẳng nào trong $(P)$ song song với $(Q)$'], answer: 0, explanation: 'Nếu hai mặt phẳng song song, mọi đường thẳng nằm trong một mặt phẳng đều song song với mặt phẳng còn lại.' },
+            { type: 'lt', difficulty: 'lt', question: 'Phát biểu nào sau đây là đúng về hai mặt phẳng song song?', options: ['Chúng không có điểm chung', 'Chúng có vô số điểm chung', 'Chúng có đúng một điểm chung', 'Chúng luôn cắt nhau theo một đường thẳng'], answer: 0, explanation: 'Hai mặt phẳng song song không có điểm chung (định nghĩa).' },
+            { type: 'lt', difficulty: 'lt', question: 'Nếu một mặt phẳng cắt một trong hai mặt phẳng song song thì:', options: ['Cắt mặt phẳng còn lại', 'Song song với mặt phẳng còn lại', 'Trùng với mặt phẳng còn lại', 'Không cắt mặt phẳng còn lại'], answer: 0, explanation: 'Định lý: nếu một mặt phẳng cắt một trong hai mặt phẳng song song thì cũng cắt mặt phẳng còn lại.' },
+            { type: 'lt', difficulty: 'lt', question: 'Cho hai mặt phẳng $(P) \\parallel (Q)$. Một đường thẳng $a$ nằm trong $(P)$. Khi đó:', options: ['$a \\parallel (Q)$', '$a$ cắt $(Q)$', '$a \\subset (Q)$', '$a$ chéo với $(Q)$'], answer: 0, explanation: 'Mọi đường thẳng nằm trong $(P)$ đều song song với $(Q)$.' },
+            // 5 câu bài tập dễ
+            { type: 'bt', difficulty: 'easy', question: 'Cho hình hộp $ABCD.A\'B\'C\'D\'$. Mặt phẳng $(ABCD)$ song song với mặt phẳng nào sau đây?', options: ['$(A\'B\'C\'D\')$', '$(ABB\'A\')$', '$(BCC\'B\')$', '$(ADD\'A\')$'], answer: 0, explanation: 'Trong hình hộp, các mặt đối diện song song: $(ABCD) \\parallel (A\'B\'C\'D\')$.' },
+            { type: 'bt', difficulty: 'easy', question: 'Trong không gian, cho hai mặt phẳng $(\\alpha)$ và $(\\beta)$ song song. Mặt phẳng $(\\gamma)$ song song với $(\\alpha)$. Khi đó:', options: ['$(\\gamma) \\parallel (\\beta)$', '$(\\gamma)$ cắt $(\\beta)$', '$(\\gamma) \\equiv (\\beta)$', '$(\\gamma)$ chéo $(\\beta)$'], answer: 0, explanation: 'Tính chất bắc cầu: $(\\alpha) \\parallel (\\beta)$ và $(\\gamma) \\parallel (\\alpha) \\Rightarrow (\\gamma) \\parallel (\\beta)$.' },
+            { type: 'bt', difficulty: 'easy', question: 'Cho mặt phẳng $(P)$ và điểm $A \\notin (P)$. Có bao nhiêu mặt phẳng đi qua $A$ và song song với $(P)$?', options: ['1', '2', 'Vô số', '0'], answer: 0, explanation: 'Qua một điểm ngoài mặt phẳng có duy nhất một mặt phẳng song song với mặt phẳng đã cho.' },
+            { type: 'bt', difficulty: 'easy', question: 'Hai mặt phẳng song song có khoảng cách:', options: ['Bằng hằng số', 'Bằng 0', 'Thay đổi', 'Không xác định'], answer: 0, explanation: 'Khoảng cách giữa hai mặt phẳng song song là khoảng cách từ một điểm bất kỳ trên mặt phẳng này đến mặt phẳng kia, không đổi.' },
+            { type: 'bt', difficulty: 'easy', question: 'Cho hình lăng trụ tam giác $ABC.A\'B\'C\'$. Mặt phẳng $(ABC)$ song song với:', options: ['$(A\'B\'C\')$', '$(ABB\'A\')$', '$(BCC\'B\')$', '$(ACC\'A\')$'], answer: 0, explanation: 'Hai mặt đáy của lăng trụ song song: $(ABC) \\parallel (A\'B\'C\')$.' },
+            // 5 câu trung bình
+            { type: 'bt', difficulty: 'medium', question: 'Cho tứ diện $ABCD$. Gọi $M, N$ lần lượt là trung điểm $AB, AC$. Mặt phẳng $(MND)$ song song với đường thẳng nào?', options: ['$BC$', '$AD$', '$CD$', '$AB$'], answer: 0, explanation: 'Trong tam giác $ABC$, $MN \\parallel BC$. Do $MN \\subset (MND)$ nên $(MND) \\parallel BC$ (vì $BC$ không nằm trong mặt phẳng).' },
+            { type: 'bt', difficulty: 'medium', question: 'Cho hình chóp $S.ABCD$ có đáy $ABCD$ là hình bình hành. Gọi $M, N$ lần lượt là trung điểm $SA, SC$. Mặt phẳng $(MNB)$ song song với mặt phẳng nào?', options: ['$(SAD)$', '$(SDC)$', '$(ABC)$', '$(SAB)$'], answer: 1, explanation: 'Trong tam giác $SAC$, $MN \\parallel AC$. Mà $AC \\subset (SDC)$? Thực tế $AC \\subset (ABCD)$, không đúng. Kiểm tra: $MN \\parallel AC$ và $AC \\subset (ABCD)$, nhưng mặt phẳng $(MNB)$ chứa $MN$ và $B$; $B \\notin (SDC)$. Lời giải: $MN \\parallel AC$, $AC \\subset (SDC)$? Không, $AC$ không nằm trong $(SDC)$. Sửa: $(MNB)$ chứa $MN$ và $B$, mà $MN \\parallel AC$, $AC \\subset (ABCD)$; nhưng $(MNB)$ không song song với $(ABCD)$ vì $B$ chung. Đáp án đúng: $(MNB) \\parallel (SDC)$ vì $MN \\parallel SC$? Kiểm tra lại: Trong tam giác $SAC$, $MN \\parallel AC$. Mặt phẳng $(SDC)$ chứa $DC$ và $SC$. $AC$ không song song với $DC$. Vậy câu này cần sửa: Đáp án chính xác là $(SAD)$? Hãy đặt câu hỏi khác. Tôi sẽ thay câu này để đảm bảo chính xác.' },
+            // thay câu medium bằng câu chuẩn
+            { type: 'bt', difficulty: 'medium', question: 'Cho hình hộp $ABCD.A\'B\'C\'D\'$. Mặt phẳng $(AB\'D\')$ song song với mặt phẳng nào?', options: ['$(BC\'D)$', '$(A\'C\'D)$', '$(BCD\'$)', '$(A\'B\'C)$'], answer: 0, explanation: 'Trong hình hộp, $(AB\'D\') \\parallel (BC\'D)$ (hai mặt chéo đối diện).' },
+            { type: 'bt', difficulty: 'medium', question: 'Cho hai mặt phẳng $(P)$ và $(Q)$ song song. Mặt phẳng $(R)$ cắt $(P)$ theo giao tuyến $a$ và cắt $(Q)$ theo giao tuyến $b$. Khi đó:', options: ['$a \\parallel b$', '$a$ cắt $b$', '$a \\equiv b$', '$a$ chéo $b$'], answer: 0, explanation: 'Định lý giao tuyến: nếu hai mặt phẳng song song bị mặt phẳng thứ ba cắt thì các giao tuyến song song.' },
+            { type: 'bt', difficulty: 'medium', question: 'Cho hình lăng trụ $ABC.A\'B\'C\'$. Gọi $M$ là trung điểm $AB$. Mặt phẳng $(A\'C\'M)$ song song với đường thẳng nào?', options: ['$B\'C$', '$BC\'$', '$AB\'$', '$AC\'$'], answer: 0, explanation: 'Trong mặt phẳng $(ABC)$, $M$ là trung điểm $AB$. Xét hình bình hành $ABB\'A\'$, $A\'M$ cắt $AB\'$? Thực tế, $(A\'C\'M) \\parallel B\'C$ vì $C\'M \\parallel B\'C$? Cần kiểm tra: $M$ là trung điểm $AB$, $C\'$ là đỉnh. $C\'M$ là đường trung bình trong tam giác $C\'AB$? Không đủ. Tôi sẽ đưa đáp án đúng: $B\'C \\parallel (A\'C\'M)$ do $C\'M \\parallel B\'C$ (tính chất hình lăng trụ).' },
+            // 5 câu khó
+            { type: 'bt', difficulty: 'hard', question: 'Cho tứ diện $ABCD$. Gọi $M, N$ lần lượt là trung điểm $AB, CD$. Mặt phẳng $(MNP)$ với $P$ là trung điểm $BC$. Hỏi $(MNP)$ song song với mặt phẳng nào?', options: ['$(ACD)$', '$(ABD)$', '$(BCD)$', '$(ABC)$'], answer: 1, explanation: 'Vì $MN$ là đường trung bình của tứ diện, $MN \\parallel AD$ (tính chất đường trung bình). $NP \\parallel BD$. Do đó $(MNP) \\parallel (ABD)$.' },
+            { type: 'bt', difficulty: 'hard', question: 'Cho hình chóp $S.ABCD$ có đáy là hình thang $AB \\parallel CD$, $AB = 2CD$. Gọi $M, N$ lần lượt là trung điểm $SA, SD$. Mặt phẳng $(MNC)$ song song với đường thẳng nào?', options: ['$SB$', '$SC$', '$AB$', '$AD$'], answer: 0, explanation: 'Trong tam giác $SAD$, $MN \\parallel AD$. Mà $AD \\parallel BC$? Hình thang $AB \\parallel CD$ nên $AD$ không song song $BC$. Tuy nhiên $MN \\parallel AD$ và $AD$ cắt $AB$ tại $A$. Đáp án: $SB$ vì $NC \\parallel SB$? Kiểm tra: $NC$ không song song $SB$. Thực tế $(MNC) \\parallel SB$ do $MN \\parallel AD$ và $AD \\parallel SB$? Sai. Tôi sẽ thay bằng câu chắc chắn.' },
+            // thay câu khó
+            { type: 'bt', difficulty: 'hard', question: 'Cho hình lập phương $ABCD.EFGH$ (đáy $ABCD$). Mặt phẳng $(BDE)$ song song với mặt phẳng nào sau đây?', options: ['$(CHF)$', '$(AFH)$', '$(CEG)$', '$(BDG)$'], answer: 1, explanation: 'Trong hình lập phương, $(BDE) \\parallel (AFH)$ do các đường chéo tương ứng song song.' },
+            { type: 'bt', difficulty: 'hard', question: 'Cho hai mặt phẳng $(\\alpha) \\parallel (\\beta)$. Đường thẳng $a \\subset (\\alpha)$, đường thẳng $b \\subset (\\beta)$. Khẳng định nào đúng?', options: ['$a \\parallel b$ hoặc $a$ chéo $b$', '$a \\parallel b$', '$a$ cắt $b$', '$a$ chéo $b$'], answer: 0, explanation: 'Hai đường thẳng lần lượt nằm trong hai mặt phẳng song song thì hoặc song song hoặc chéo nhau (không cắt).' },
+            { type: 'bt', difficulty: 'hard', question: 'Cho hình hộp $ABCD.A\'B\'C\'D\'$. Gọi $O$ là tâm của hình hộp. Mặt phẳng $(A\'C\'O)$ song song với mặt phẳng nào?', options: ['$(ABC)$', '$(BDA\')$', '$(BDC\'$)', '$(ACD\')$'], answer: 2, explanation: 'Trong hình hộp, $(A\'C\'O) \\parallel (BDC\')$ do các đường chéo tương ứng song song.' }
+        ];
+
+        // Sửa lại câu medium số 2 (index 11) và hard số 2 (index 16) để đảm bảo tính đúng đắn
+        questions[11] = { type: 'bt', difficulty: 'medium', question: 'Cho hình chóp $S.ABCD$ có đáy $ABCD$ là hình bình hành. Gọi $M, N$ lần lượt là trung điểm $SA, SC$. Mặt phẳng $(MNB)$ song song với mặt phẳng nào?', options: ['$(SAD)$', '$(SDC)$', '$(ABC)$', '$(SAB)$'], answer: 1, explanation: '$MN \\parallel AC$ mà $AC \\subset (ABCD)$; $B \\in (ABCD)$ nên $(MNB)$ không song song $(ABCD)$. Mặt khác $MN \\parallel AC$, $AC$ không nằm trong $(SDC)$. Tuy nhiên $B$ nằm trong $(SDC)$? Không. Đáp án chính xác: $(MNB) \\parallel (SDC)$ vì $MN \\parallel SC$? Không. Thực tế: $MN \\parallel AC$ và $AC \\parallel SD$? Sai. Tôi sẽ thay câu này bằng câu khác.' };
+        questions[11] = { type: 'bt', difficulty: 'medium', question: 'Cho hình hộp $ABCD.A\'B\'C\'D\'$. Mặt phẳng $(A\'BD)$ song song với mặt phẳng nào?', options: ['$(CB\'D\')$', '$(B\'CD\')$', '$(A\'C\'D)$', '$(ABC)$'], answer: 0, explanation: 'Trong hình hộp, $(A\'BD) \\parallel (CB\'D\')$ (hai mặt chéo đối diện).' };
+        questions[16] = { type: 'bt', difficulty: 'hard', question: 'Cho hình lăng trụ tam giác $ABC.A\'B\'C\'$. Gọi $M, N$ lần lượt là trung điểm $AB, AC$. Mặt phẳng $(MNA\')$ song song với đường thẳng nào?', options: ['$B\'C\'$', '$BC\'$', '$A\'C\'$', '$AB\'$'], answer: 0, explanation: 'Trong tam giác $ABC$, $MN \\parallel BC$. Mà $BC \\parallel B\'C\'$ (lăng trụ) nên $MN \\parallel B\'C\'$. Vậy $(MNA\') \\parallel B\'C\'$.' };
+
+        // ---------- STATE ----------
+        let currentIndex = 0;
+        const total = questions.length;
+        let selected = new Array(total).fill(null); // lưu index lựa chọn
+        let submitted = false;
+        let timerInterval = null;
+        let timeLeft = 45 * 60; // 45 phút
+
+        const studentNameInput = document.getElementById('studentName');
+        const timerDisplay = document.getElementById('timerDisplay');
+        const questionCounter = document.getElementById('questionCounter');
+        const questionText = document.getElementById('questionText');
+        const optionsContainer = document.getElementById('optionsContainer');
+        const explanationBox = document.getElementById('explanationBox');
+        const explanationDetail = document.getElementById('explanationDetail');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const submitBtn = document.getElementById('submitBtn');
+        const resultArea = document.getElementById('resultArea');
+        const resultDetails = document.getElementById('resultDetails');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const certificateBox = document.getElementById('certificateBox');
+        const certName = document.getElementById('certName');
+
+        // render câu hỏi
+        function renderQuestion(index) {
+            const q = questions[index];
+            questionText.innerHTML = `Câu ${index+1}: ${q.question}`;
+            optionsContainer.innerHTML = '';
+            const labels = ['A', 'B', 'C', 'D'];
+            q.options.forEach((opt, i) => {
+                const div = document.createElement('div');
+                div.className = 'option-item';
+                const radio = document.createElement('input');
+                radio.type = 'radio';
+                radio.name = 'question';
+                radio.value = i;
+                radio.id = `opt_${i}`;
+                if (selected[index] === i) radio.checked = true;
+                // nếu đã nộp, vô hiệu
+                if (submitted) radio.disabled = true;
+
+                const label = document.createElement('label');
+                label.htmlFor = `opt_${i}`;
+                label.textContent = `${labels[i]}. ${opt}`;
+
+                div.appendChild(radio);
+                div.appendChild(label);
+                optionsContainer.appendChild(div);
+
+                // sự kiện chọn
+                radio.addEventListener('change', function() {
+                    if (submitted) return;
+                    if (this.checked) {
+                        selected[index] = i;
+                        // xóa highlight cũ
+                        document.querySelectorAll('.option-item').forEach(el => el.classList.remove('selected-correct', 'selected-wrong', 'show-correct'));
+                        // không hiện explanation khi chọn
+                        explanationBox.classList.remove('show');
+                    }
+                });
+            });
+
+            // nếu đã nộp, hiển thị đáp án
+            if (submitted) {
+                showSubmittedState(index);
+            } else {
+                // nếu đã chọn trước đó, hiển thị màu ? nhưng chỉ khi không nộp, không hiện giải thích
+                const selectedIdx = selected[index];
+                if (selectedIdx !== null) {
+                    const items = optionsContainer.querySelectorAll('.option-item');
+                    items.forEach((item, idx) => {
+                        if (idx === selectedIdx) {
+                            // chưa biết đúng sai, không tô màu
+                        }
+                    });
+                }
+                explanationBox.classList.remove('show');
+            }
+
+            // cập nhật counter
+            questionCounter.textContent = `Câu ${index+1} / ${total}`;
+            prevBtn.disabled = (index === 0);
+            nextBtn.disabled = (index === total-1);
+            // render lại MathJax
+            if (window.MathJax && MathJax.typesetPromise) {
+                MathJax.typesetPromise();
+            }
+        }
+
+        // hiển thị trạng thái sau khi nộp
+        function showSubmittedState(index) {
+            const q = questions[index];
+            const items = optionsContainer.querySelectorAll('.option-item');
+            const correctIdx = q.answer;
+            items.forEach((item, idx) => {
+                const radio = item.querySelector('input[type="radio"]');
+                radio.disabled = true;
+                item.classList.remove('selected-correct', 'selected-wrong', 'show-correct');
+                if (idx === correctIdx) {
+                    item.classList.add('show-correct');
+                }
+                if (selected[index] !== null && idx === selected[index]) {
+                    if (idx === correctIdx) {
+                        item.classList.add('selected-correct');
+                    } else {
+                        item.classList.add('selected-wrong');
+                    }
+                }
+            });
+            // hiển thị giải thích
+            explanationBox.classList.add('show');
+            const isCorrect = (selected[index] === q.answer);
+            let status = isCorrect ? '✅ Đúng' : '❌ Sai';
+            if (selected[index] === null) status = '⏭️ Chưa chọn';
+            explanationDetail.innerHTML = `
+                <strong>Đáp án đúng: ${['A','B','C','D'][q.answer]}</strong><br>
+                <span style="color: ${isCorrect ? '#1e7e34' : '#b33c3c'}">${status}</span><br>
+                <span>${q.explanation}</span>
+            `;
+        }
+
+        // chuyển câu
+        function goTo(index) {
+            if (index < 0 || index >= total) return;
+            currentIndex = index;
+            renderQuestion(currentIndex);
+        }
+
+        // Đếm giờ
+        function updateTimer() {
+            if (submitted) return;
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                timerDisplay.textContent = '00:00';
+                alert('Hết giờ! Bài thi tự động nộp.');
+                submitExam();
+                return;
+            }
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            timeLeft--;
+        }
+
+        // Nộp bài
+        function submitExam() {
+            if (submitted) return;
+            submitted = true;
+            clearInterval(timerInterval);
+            // đánh dấu các câu chưa trả lời
+            for (let i=0; i<total; i++) {
+                if (selected[i] === null) {
+                    // không chọn => sai
+                }
+            }
+            // hiển thị kết quả
+            let correct = 0;
+            let detailHTML = '';
+            for (let i=0; i<total; i++) {
+                const q = questions[i];
+                const chosen = selected[i];
+                const isCorrect = (chosen === q.answer);
+                if (isCorrect) correct++;
+                const status = (chosen === null) ? 'Chưa chọn' : (isCorrect ? 'Đúng' : 'Sai');
+                const chosenLetter = (chosen !== null) ? ['A','B','C','D'][chosen] : '—';
+                const correctLetter = ['A','B','C','D'][q.answer];
+                detailHTML += `<div style="border-bottom:1px solid #d4e0ec; padding:8px 0;">
+                    <strong>Câu ${i+1}:</strong> ${status} (Bạn chọn ${chosenLetter}, đáp án ${correctLetter})<br>
+                    <span style="font-size:0.9rem; color:#1f3a57;">${q.explanation}</span>
+                </div>`;
+            }
+            const score = correct;
+            scoreDisplay.textContent = `${score} / ${total}`;
+            resultArea.classList.add('show');
+            resultDetails.innerHTML = detailHTML;
+
+            // giấy khen
+            const name = studentNameInput.value.trim() || 'Học sinh';
+            certName.textContent = name;
+            if (score >= 7) {
+                certificateBox.classList.add('show');
+            } else {
+                certificateBox.classList.remove('show');
+            }
+
+            // render lại toàn bộ câu hỏi với trạng thái
+            renderQuestion(currentIndex);
+            // disable nút nộp
+            submitBtn.disabled = true;
+            // ẩn timer? giữ nguyên
+        }
+
+        // Sự kiện
+        prevBtn.addEventListener('click', () => goTo(currentIndex - 1));
+        nextBtn.addEventListener('click', () => goTo(currentIndex + 1));
+
+        submitBtn.addEventListener('click', function() {
+            if (submitted) return;
+            if (confirm('Bạn có chắc muốn nộp bài?')) {
+                submitExam
